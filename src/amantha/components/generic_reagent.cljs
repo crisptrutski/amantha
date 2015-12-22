@@ -1,6 +1,6 @@
 (ns amantha.components.generic-reagent
   (:require [amantha.utils :as utils]
-            [bss.rampant.utils :refer [glyphicon]]
+            [amantha.utils :refer [glyphicon]]
             [reagent.core :as reagent]
             [re-frame.core :refer [dispatch]]))
 

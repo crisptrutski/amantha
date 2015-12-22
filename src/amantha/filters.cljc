@@ -1,4 +1,4 @@
-(ns bss.rampant.filters)
+(ns amantha.filters)
 
 (defn ->float [s]
   #?(:clj  (Double. (str s))
@@ -7,7 +7,6 @@
 (defmulti filter-check first)
 
 (defmethod filter-check :default [payload]
-  ;; TODO: log properly
   (prn "WARNING: unable to filter payload " payload)
   (constantly true))
 

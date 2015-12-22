@@ -1,5 +1,5 @@
 (ns amantha.pages
-  (:require [bss.rampant.utils :refer [titlecase]]
+  (:require [amantha.utils :refer [titlecase]]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 

@@ -3,14 +3,12 @@
   (:require [amantha.components.charts :as charts]
             [amantha.components.generic :refer [start-tracking-server! stop-tracking-server!]]
             [amantha.components.roll-up-selector :as roll-up-sel]
-            [amantha.data.api :as api]
-            [amantha.state :as state]
             [amantha.utils :as utils]
             [cljsjs.moment]
-            [goog.string :as gstring]
+            [goog.string]
             [goog.string.format]
             [om.core :as om :include-macros true]
-            [sablono.core :as html :refer-macros [html]]
+            [sablono.core :refer-macros [html]]
             [cljs.core.async :refer [put! chan <! alts!]]))
 
 (defn- money-tooltip []

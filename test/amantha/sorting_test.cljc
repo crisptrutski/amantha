@@ -1,5 +1,5 @@
-(ns bss.rampant.sorting-test
-  (:require [bss.rampant.sorting :as s]
+(ns amantha.sorting-test
+  (:require [amantha.sorting :as s]
             #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is testing]])))
 

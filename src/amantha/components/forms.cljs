@@ -1,6 +1,5 @@
 (ns amantha.components.forms
-  (:require  [amantha.utils :refer [handler-fn]]
-             [bss.rampant.utils :refer [e->value]]
+  (:require  [amantha.utils :refer [e->value handler-fn]]
              [reagent.ratom :as ratom]))
 
 (defn serialize-form

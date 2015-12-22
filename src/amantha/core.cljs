@@ -18,8 +18,8 @@
             [amantha.pages.sales]
             [amantha.state :refer [app-state]]
             [amantha.utils :refer [reagent-bridge]]
-            [bss.rampant.filters :refer [filter-data]]
-            [bss.rampant.utils :as utils :refer [gen-id glyphicon right-glyphicon]]
+            [amantha.filters :refer [filter-data]]
+            [amantha.utils :as utils :refer [gen-id glyphicon right-glyphicon]]
             [om.core :as om :include-macros true]
             [re-frame.core :refer [subscribe]]))
 

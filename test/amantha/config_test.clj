@@ -1,5 +1,5 @@
-(ns bss.rampant.config-test
-  (:require [bss.rampant.config :refer :all]
+(ns amantha.config-test
+  (:require [amantha.config :refer :all]
             [clojure.test :refer :all]
             [environ.core :refer [env]])
   (:import [java.net ServerSocket]))
@@ -38,7 +38,7 @@
   (testing "put it all together"
     (is (= {;; :version      version
             :host         (guess-host-name)
-            :service-name "bss.rampant"
+            :service-name "amantha"
             :lein-version (:lein-version env) ;; "2.5.1"
             :port         231}
            (gen-conf

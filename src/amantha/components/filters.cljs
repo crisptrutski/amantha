@@ -2,7 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [cljs.core.async :refer [put!]]
             [sablono.core :refer-macros [html]]
-            [bss.rampant.utils :refer [e->value]]
+            [amantha.utils :refer [e->value]]
             [amantha.components.date-range-picker :refer [date-range-picker]]
             [amantha.components.single-date-picker :refer [single-date-picker]]
             [amantha.utils :refer [register-path-get-and-set enumerate]]

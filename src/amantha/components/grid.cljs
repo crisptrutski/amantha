@@ -2,9 +2,9 @@
   (:require [om.core :as om :include-macros true]
             [amantha.components.generic :as generic]
             [amantha.data.api :as api]
-            [bss.rampant.pagination :as page]
-            [bss.rampant.sorting :as s]
-            [bss.rampant.utils :as utils :refer [glyphicon right-glyphicon]]
+            [amantha.pagination :as page]
+            [amantha.sorting :as s]
+            [amantha.utils :as utils :refer [glyphicon right-glyphicon]]
             [clojure.string :as str]
             [goog.string :as gstring]
             [sablono.core :as html :refer-macros [html]]))

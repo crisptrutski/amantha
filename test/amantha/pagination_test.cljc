@@ -1,6 +1,6 @@
-(ns bss.rampant.pagination-test
-  (:require [bss.rampant.pagination :as page]
-            [bss.rampant.sorting :refer [sort-by-keys]]
+(ns amantha.pagination-test
+  (:require [amantha.pagination :as page]
+            [amantha.sorting :refer [sort-by-keys]]
             #?(:clj  [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is testing]])))
 
@@ -30,30 +30,30 @@
 
 (deftest parse-test
   (testing "first"
-    (is (instance? bss.rampant.pagination.FirstPage (page/parse [:open])))
-    (is (instance? bss.rampant.pagination.FirstPage (page/parse [:first]))))
+    (is (instance? amantha.pagination.FirstPage (page/parse [:open])))
+    (is (instance? amantha.pagination.FirstPage (page/parse [:first]))))
 
   (testing "last"
-    (is (instance? bss.rampant.pagination.LastPage (page/parse [:last]))))
+    (is (instance? amantha.pagination.LastPage (page/parse [:last]))))
 
   (testing "before"
     (let [before [:before [32] false]
           parsed (page/parse before)]
-      (is (instance? bss.rampant.pagination.PageBefore parsed))
+      (is (instance? amantha.pagination.PageBefore parsed))
       (is (= [32] (:value parsed)))
       (is (= false (:inclusive parsed)))))
 
   (testing "after"
     (let [after  [:after ["a" 3] true]
           parsed (page/parse after)]
-      (is (instance? bss.rampant.pagination.PageAfter parsed))
+      (is (instance? amantha.pagination.PageAfter parsed))
       (is (= ["a" 3] (:value parsed)))
       (is (= true (:inclusive parsed)))))
 
   (testing "range"
     (let [range  [:range ["a"] ["g"]]
           parsed (page/parse range)]
-      (is (instance? bss.rampant.pagination.PageRange parsed))
+      (is (instance? amantha.pagination.PageRange parsed))
       (is (= ["a"] (:from parsed)))
       (is (= ["g"] (:to parsed))))))
 

@@ -1,4 +1,4 @@
-(ns bss.rampant.sorting)
+(ns amantha.sorting)
 
 ;; generic
 ;; ----------------------------

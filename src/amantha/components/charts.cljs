@@ -4,7 +4,7 @@
             [amantha.data.api :as api]
             [amantha.components.generic :as generic]
             [amantha.utils :as formatter]
-            [bss.rampant.utils :refer [gen-id] :as utils]
+            [amantha.utils :refer [gen-id] :as utils]
             [highcharts.js]
             [om.core :as om :include-macros true]
             [sablono.core :refer-macros [html]]))

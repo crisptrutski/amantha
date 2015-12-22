@@ -1,5 +1,5 @@
-(ns bss.rampant.filters-test
-  (:require [bss.rampant.filters :as f]
+(ns amantha.filters-test
+  (:require [amantha.filters :as f]
             #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is]])))
 

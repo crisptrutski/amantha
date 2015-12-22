@@ -1,6 +1,6 @@
 (ns amantha.config.repairs
   (:require [amantha.utils :refer [format-currency]]
-            [bss.rampant.utils :as utils :refer [format-date]]
+            [amantha.utils :as utils :refer [format-date]]
             [clojure.string :as str]
             [goog.string]
             [goog.string.format]

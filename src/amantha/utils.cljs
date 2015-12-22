@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [reagent.ratom :refer [reaction]])
   (:require #_[ajax.core :refer [GET]]
-            [cljs.core.async :refer [<!]]
+            [cljs.core.async :as async :refer [<!]]
             [cljsjs.moment]
             [clojure.string :as str]
             [goog.string :as gstring]
@@ -69,7 +69,7 @@
          :response-format :edn})))
 
 (defn listen [channel handler]
-  (go (while true
+  (async/go (while true
         (handler (<! channel)))))
 
 (defn zip [& colls]
@@ -120,32 +120,3 @@
   (doseq [[key path] (partition 2 key-path-pairs)]
     (register-path-sub key path)
     (register-set-path-handler key path)))
-
-(defn truncate [text]
-  (str (subs text 0 40) "..."))
-
-(defn reagent-bridge
-  "Mount a Reagent component inside an Om component tree.
-
-  Example:
-
-  (om/build reagent-bridge cursor {:opts {:component reagent-component-fn}})"
-  [_ owner {:keys [component]}]
-  (reify
-    om/IDidMount
-    (did-mount [_]
-      (let [elem (om/get-node owner "reagent-component")]
-        (reagent/render-component [component] elem)))
-
-    om/IRender
-    (render [_]
-      (html
-       [:span {:ref "reagent-component"}]))))
-
-(defn on-enter [callback]
-  (fn [evt]
-    (when (= 13 (.-keyCode evt))
-      (callback evt))))
-
-(defn map-function-on-map-vals [m f]
-  (reduce (fn [altered-map [k v]] (assoc altered-map k (f v))) {} m))

@@ -1,6 +1,6 @@
 (ns amantha.data.filters
   (:require [clojure.string :as str]
-            [bss.rampant.filters :refer [filter-check]]))
+            [amantha.filters :refer [filter-check]]))
 
 (defn ->float [s]
   (js/parseFloat s))

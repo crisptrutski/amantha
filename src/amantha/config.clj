@@ -1,8 +1,7 @@
-(ns bss.rampant.config
+(ns amantha.config
   (:require [clojure.string :as str]
-            [clojure.java.io :as io]
             [environ.core :refer [env]])
-  (:import [java.net ServerSocket]))
+  (:import [java.net ServerSocket InetAddress]))
 
 ;; helpers
 
@@ -33,7 +32,7 @@
        (str/join ".")))
 
 (defn guess-host-name []
-  (.getCanonicalHostName (java.net.InetAddress/getLocalHost)))
+  (.getCanonicalHostName (InetAddress/getLocalHost)))
 
 ;; layers
 

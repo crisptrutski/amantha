@@ -1,4 +1,5 @@
-(defproject amantha
+(defproject
+  boot-project
   "0.0.0-SNAPSHOT"
   :dependencies
   [[adzerk/boot-cljs "1.7.170-3" :scope "test"]
@@ -10,10 +11,12 @@
    [com.cemerick/piggieback "0.2.1" :scope "test"]
    [weasel "0.7.0" :scope "test"]
    [org.clojure/tools.nrepl "0.2.12" :scope "test"]
+   [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT" :scope "test"]
    [ankha "0.1.5.1-64423e"]
    [ring "1.4.0"]
    [compojure "1.4.0"]
-   [org.om/om "0.8.1" :exclusions [cljsjs/react com.facebook/react]]
+   [enlive "1.1.6"]
+   [org.om/om "0.8.1"]
    [environ "1.0.1"]
    [sablono "0.5.3"]
    [secretary "1.2.3"]

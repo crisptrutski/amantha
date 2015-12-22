@@ -1,4 +1,4 @@
-(ns bss.rampant.utils
+(ns amantha.utils
   (:refer-clojure :exclude [read-string])
   #?@(:clj [(:require [clojure.edn :refer [read-string]]
                       [clojure.java.io :as io]

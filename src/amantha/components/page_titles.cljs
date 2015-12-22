@@ -1,5 +1,5 @@
 (ns amantha.components.page-titles
-  (:require [bss.rampant.utils :refer [titlecase]]
+  (:require [amantha.utils :refer [titlecase]]
             [re-frame.core :refer [register-handler register-sub subscribe]]
             [amantha.routing :as routing]
             [amantha.components.generic-reagent :as v]))

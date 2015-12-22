@@ -1,5 +1,5 @@
-(ns bss.rampant.utils-test
-  (:require [bss.rampant.utils :as u]
+(ns amantha.utils-test
+  (:require [amantha.utils :as u]
             #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is testing]])))
 

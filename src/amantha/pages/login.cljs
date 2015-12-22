@@ -1,7 +1,7 @@
 (ns amantha.pages.login
-  (:require [bss.rampant.utils :as utils :refer [e->value]]
+  (:require [amantha.utils :as utils :refer [e->value]]
             [om.core :as om :include-macros true]
-            [sablono.core :as html :refer-macros [html]]))
+            [sablono.core :refer-macros [html]]))
 
 (defn bind-input [owner key [tag attrs]]
   [tag (assoc attrs
