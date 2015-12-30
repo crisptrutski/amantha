@@ -2,7 +2,7 @@
   (:require
     #_select2.js
     [cljs.core.async :refer [put!]]
-    [amantha.utils :refer [e->value register-path-get-and-set enumerate]]
+    [amantha.utils :as u]
     [clojure.string :as str]
     [re-frame.core :refer [subscribe dispatch register-sub register-handler]]))
 
@@ -10,7 +10,7 @@
 
 (defn handle-full-text-search-change [pattern state]
   (fn [e]
-    (let [v (e->value e)]
+    (let [v (u/e->value e)]
       (swap! state assoc :value v)
       (swap! state assoc :filters [[:include-string v pattern]]))))
 
@@ -36,7 +36,7 @@
 
 (defn handle-categorical-selector-change [state _]
   (fn [e]
-    (let [v (e->value e)
+    (let [v (u/e->value e)
           v (if (= v "default") nil v)]
       (swap! state assoc :value v)
       (swap! state assoc :filters [[:equal v]]))))
@@ -94,7 +94,7 @@
 
 (defn handle-number-range-change [key state owner]
   (fn [e]
-    (let [s (str/replace (e->value e) #"\D" "")
+    (let [s (str/replace (u/e->value e) #"\D" "")
           v (if-not (empty? s) s)]
       (swap! state assoc key v)
       (swap! state assoc
@@ -120,10 +120,6 @@
                             :value       (:<= data)
                             :placeholder (:placeholder data)}]]]]])
 
-(register-path-get-and-set
-  :filter
-  [:filters])
-
 (defn num-days [[page filter-key]]
   (let [filter (subscribe [:filter page filter-key])]
     (fn [_]
@@ -134,7 +130,7 @@
           [:input.form-control
            {:type      :number
             :value     value
-            :on-change #(dispatch [:filter page filter-key :value (str/replace (e->value %) #"\D" "")])}]
+            :on-change #(dispatch [:filter page filter-key :value (str/replace (u/e->value %) #"\D" "")])}]
           [:span.input-group-addon "days"]]]))))
 
 (defn button [[page filter-key]]
@@ -153,9 +149,9 @@
 (defn grouped-filters-base [filter-view-handler]
   (fn [filters]
     [:div.filter-panel
-     (for [[rownum filter-group] (enumerate (partition-all 3 filters))]
+     (for [[rownum filter-group] (u/enumerate (partition-all 3 filters))]
        [:div.row {:key rownum}
-        (for [[colnum filter] (enumerate filter-group)]
+        (for [[colnum filter] (u/enumerate filter-group)]
           [:div.col-md-4.col-lg-4
            {:key colnum}
            (filter-view-handler filter-view filter)])])]))

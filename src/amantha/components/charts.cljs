@@ -2,7 +2,7 @@
   (:require
     [clojure.string :as str]
     [amantha.utils :as formatter]
-    [amantha.utils :refer [gen-id] :as utils]
+    [amantha.utils :as u]
     #_[highcharts.js]))
 
 (defn -get [name obj]
@@ -72,5 +72,5 @@
 (defn build-histogram [data bucket-fn x-axis y-axis]
   (let [bucket-fn* (comp #(or % "(no data)" %) bucket-fn)
         chart-data (into (sorted-map)
-                         (utils/frequencies-by bucket-fn* data))]
+                         (u/frequencies-by bucket-fn* data))]
     (draw-histogram chart-data x-axis y-axis)))

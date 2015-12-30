@@ -38,17 +38,19 @@
   (testing "covers entire sentence"
     (is (= "The Whole Enchilada"
            (u/titlecase "the whole enchilada"))))
+  (testing "respects whitespace"
+    (is (= "AT  Bat\t  \n Cat"
+           (u/titlecase "aT  bat\t  \n cat"))))
   (testing "preserves case"
     (is (= "NATO"
            (u/titlecase "NATO"))
         (= "PLATO"
            (u/titlecase "pLATO")))))
 
-(deftest data->csv-test
-  (testing "Quote and escape only when necessary"
-    (is (= "a,b,\"a,b\"\n1,[2 3],3\n\",\",dog,c"
-           (u/data->csv [{:a 1, :b [2,3] (keyword "a,b") 3}
-                         {:a ",", :b "dog", (keyword "a,b") \c}])))))
+#?(:cljs
+   (deftest format-currency-test
+     (is (= "R 1,234,567.89"
+            (u/format-currency :amount 1234567.8910)))))
 
 (deftest glyhicon-test
   (testing "both varieties"
