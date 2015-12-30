@@ -1,13 +1,9 @@
 (ns amantha.components.charts
-  (:require [clojure.string :as str]
-            [amantha.data.api :as api]
-            [amantha.data.api :as api]
-            [amantha.components.generic :as generic]
-            [amantha.utils :as formatter]
-            [amantha.utils :refer [gen-id] :as utils]
-            [highcharts.js]
-            [om.core :as om :include-macros true]
-            [sablono.core :refer-macros [html]]))
+  (:require
+    [clojure.string :as str]
+    [amantha.utils :as formatter]
+    [amantha.utils :refer [gen-id] :as utils]
+    #_[highcharts.js]))
 
 (defn -get [name obj]
   (aget obj name))
@@ -16,29 +12,27 @@
   (let [f (aget obj fname)]
     (.apply f obj (clj->js args))))
 
-(defn create-highchart [owner chart-opts]
-  (js/Highcharts.Chart. (clj->js (assoc-in chart-opts [:chart :renderTo] (om/get-node owner "chart")))))
+(defn create-highchart [chart-opts]
+  (js/Highcharts.Chart.
+    (clj->js
+      (assoc-in
+        chart-opts [:chart :renderTo]
+        nil #_(om/get-node owner "chart")))))
 
-(defn highchart-view [cursor owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [{:keys [width height]} cursor]
-        (html
-         [:div {:class-name (if (:loading? cursor) "data-loading")
-                :ref "chart" :style {:width width :height height}}])))
-    om/IDidMount
-    (did-mount [_]
-      (create-highchart owner cursor))
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (create-highchart owner cursor))))
+(defn highchart-view [chart-opts]
+  {:render     (fn []
+                 (let [{:keys [width height]} chart-opts]
+                   [:div {:class-name (when (:loading? chart-opts) "data-loading")
+                          :ref        "chart"
+                          :style      {:width width :height height}}]))
+   :did-mount  (fn [_] (create-highchart chart-opts))
+   :did-update (fn [_ _ _] (create-highchart chart-opts))})
 
 (defn- histogram-tooltip [x-axis y-axis]
   (this-as point
-           (let [y-label (aget point "y")
-                 x-label (aget point "x")]
-             (str x-label " - " y-label))))
+    (let [y-label (aget point "y")
+          x-label (aget point "x")]
+      (str x-axis ": " x-label ", " y-axis ": " y-label))))
 
 (defn- titlecase-word [word]
   (apply str (.toUpperCase (first word))
@@ -51,10 +45,10 @@
 
     (keyword? value)
     (as-> value x
-      (name x)
-      (str/split x #"-")
-      (map titlecase-word x)
-      (str/join " " x))
+          (name x)
+          (str/split x #"-")
+          (map titlecase-word x)
+          (str/join " " x))
 
     :else
     value))
@@ -62,55 +56,21 @@
 (defn draw-histogram [chart-data x-axis y-axis & [overrides]]
   (let [x-axis-data (map histogram-label (map first chart-data))
         y-axis-data (map histogram-label (map last chart-data))
-        chart-opts (merge {:loading? (empty? x-axis-data)
-                           :chart    {:type "column"}
-                           :legend   {:enabled false}
-                           :title    {:text ""}
-                           :xAxis    {:title {:text (histogram-label x-axis)} :categories x-axis-data}
-                           :yAxis    {:title {:text (histogram-label y-axis)}}
-                           :series   [{:data y-axis-data}] ;; animation false
-                           :tooltip  {:formatter histogram-tooltip}
-                           :width    "100%"
-                           :height   250}
-                          overrides)]
-    (om/build highchart-view chart-opts)))
-
-(defn server-histogram [cursor {:keys [data-key hist-key x-axis y-axis] :as opts} owner]
-  (when (not= opts(om/get-state owner :old-opts))
-    (om/set-state! owner :old-opts opts)
-    (generic/dirty! owner))
-
-  (when (generic/dirty? owner)
-    (api/histogram (fn [data]
-                     (generic/clean! owner)
-                     (om/update! cursor data-key data))
-                   data-key
-                   hist-key
-                   {:filter  (om/value (:filter opts))
-                    :roll-up (om/value (:roll-up opts))}))
-
-  (html
-   [:div (if (generic/dirty? owner) {:style {:opacity 0.5}})
-    ;; FIXME: use axis labels from data - empower that API
-    (draw-histogram (get cursor data-key)
-                    x-axis
-                    y-axis)]))
-
-(defn server-histogram-view [{:keys [options cursor]} owner _]
-  (let [korks [:global-sha (:data-key options)]]
-    (generic/tracked-component-shell owner
-                                     server-histogram cursor options
-                                     owner)))
+        chart-opts  (merge {:loading? (empty? x-axis-data)
+                            :chart    {:type "column"}
+                            :legend   {:enabled false}
+                            :title    {:text ""}
+                            :xAxis    {:title {:text (histogram-label x-axis)} :categories x-axis-data}
+                            :yAxis    {:title {:text (histogram-label y-axis)}}
+                            :series   [{:data y-axis-data}] ;; animation false
+                            :tooltip  {:formatter histogram-tooltip}
+                            :width    "100%"
+                            :height   250}
+                           overrides)]
+    (highchart-view chart-opts)))
 
 (defn build-histogram [data bucket-fn x-axis y-axis]
   (let [bucket-fn* (comp #(or % "(no data)" %) bucket-fn)
         chart-data (into (sorted-map)
                          (utils/frequencies-by bucket-fn* data))]
     (draw-histogram chart-data x-axis y-axis)))
-
-(defmulti custom-chart-view (fn [config] (:chart-key config)))
-
-(defmethod custom-chart-view
-  :default
-  [app owner _]
-  (om/component (html [:div "Bad config"])))

@@ -1,7 +1,6 @@
 (ns amantha.google
   (:require #_[ajax.core :refer [GET]]
-            [amantha.state :as state]
-            [gapi.js]))
+            #_[gapi.js]))
 
 (declare GET)
 
@@ -16,24 +15,24 @@
       (.then cb)))
 
 (defn get-token []
-  (if-let [token (.getToken js/gapi.auth)]
+  (when-let [token (.getToken js/gapi.auth)]
     (.-access_token token)))
 
 (defn build-identity [result]
-  {:name          (get-in result [:result :displayName])
+  {:name  (get-in result [:result :displayName])
    :email (->> (get-in result [:result :emails])
-                       (filter (comp #{"account"} :type))
-                       (first)
-                       (:value))})
+               (filter (comp #{"account"} :type))
+               first
+               :value)
+   :source result})
 
-(defn handle-sign-in [auth-result]
+(defn handle-sign-in [state auth-result]
   (if (signed-in? auth-result)
-    ;; TODO: store the entire profile
-    (profile (comp state/set-user! partial build-identity))
+    (profile (comp #(swap! state :session %) build-identity))
     (prn "Sign in state: " (keyword (.-error auth-result)))))
 
-(defn sign-in []
-  (.signIn js/gapi.auth #js {"callback" handle-sign-in}))
+(defn sign-in [state]
+  (.signIn js/gapi.auth #js {"callback" (partial handle-sign-in state)}))
 
 (defn disconnect [& [cb]]
   ;; FIXME: this is hitting a CORS error, should be sent as JSONP instead
@@ -41,11 +40,10 @@
       {:error-handler cb
        :handler       cb}))
 
-(defn sign-in-view []
-  [:button#g-signin {:on-click sign-in}
+(defn sign-in-view [state]
+  [:button#g-signin {:on-click (partial sign-in state)}
    [:span.icon]
    [:span.buttonText "Sign in"]])
 
-(defn sign-out [app]
-  (fn []
-    (disconnect (fn [] (state/remove-session app)))))
+(defn sign-out [state]
+  (disconnect (fn [] (swap! state dissoc :session))))

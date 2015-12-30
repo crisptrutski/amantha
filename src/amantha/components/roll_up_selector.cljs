@@ -1,12 +1,5 @@
 (ns amantha.components.roll-up-selector
-  (:require [amantha.components.generic :as generic]
-            [amantha.data.api :as api]
-            [amantha.utils :as utils]
-            [cljsjs.moment]
-            [goog.string :as gstring]
-            [goog.string.format]
-            [om.core :as om :include-macros true]
-            [sablono.core :as html :refer-macros [html]]))
+  (:require [amantha.utils :as utils]))
 
 (defn format-daily     [date] (utils/format-date :date date :format "Do MMM YYYY"))
 (defn format-weekly    [date] (utils/format-date :date date :format "Do MMM YYYY"))
@@ -21,15 +14,8 @@
    {:name "Quarterly" :interval :quarterly :formatter format-quarterly}
    {:name "Yearly"    :interval :yearly    :formatter format-yearly}])
 
-(defn change-chart-interval [owner interval]
-  (om/set-state! owner :chart-interval interval))
-
-(defn get-interval [owner]
-  (or (om/get-state owner :chart-interval)
-      (second chart-intervals)))
-
-(defn chart-interval-selector [owner]
-  (let [interval (get-interval owner)]
+(defn chart-interval-selector [state]
+  (let [interval (:interval @state)]
     [:div.col-md-8
      [:label "Chart interval"]
      [:div.btn-group.chart-interval-dropdown
@@ -38,8 +24,8 @@
        (:name interval) " "
        [:span.caret]]
       [:ul.dropdown-menu {:role "menu"}
-       (for [{:keys [name formatter] :as interval} chart-intervals]
+       (for [{:keys [name] :as interval} chart-intervals]
          [:li [:a {:href "#"
                    :key name
-                   :on-click #(change-chart-interval owner interval)}
+                   :on-click #(swap! state assoc :interval % interval)}
                name]])]]]))

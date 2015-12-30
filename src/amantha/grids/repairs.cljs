@@ -1,7 +1,5 @@
-(ns amantha.config.repairs
-  (:require [amantha.utils :refer [format-currency]]
-            [amantha.utils :as utils :refer [format-date]]
-            [clojure.string :as str]
+(ns amantha.grids.repairs
+  (:require [amantha.utils :as utils :refer [format-currency format-date]]
             [goog.string]
             [goog.string.format]
             [cljs.core.async :refer [chan]]))
@@ -28,7 +26,7 @@
 (defn points-render [num]
   (let [num   (if (number? num) num (js/parseInt num))
         full  (take num full-stars)
-        empty (take (- 3 num) empty-stars)
+        empty (take (- 5 num) empty-stars)
         stars (concat full empty)]
     (into [:span] (interpose " " stars))))
 
@@ -42,21 +40,13 @@
 (defn tick-view [tick?]
   (utils/glyphicon (if tick? :ok :remove)))
 
-(defn strip-branch
-  "For branch-prefixed strings, strip the branch"
-  [value]
-  (let [chunks (str/split value #"-")]
-    (if (> (count chunks) 1)
-      (str/join "-" (rest chunks))
-      (first chunks))))
-
 (def grids
   {:payments {:data-key  [:payments]
               :chart-key :custom-payments-chart
               :sort-keys [:id :created-at]
               :headers   [["Date" :created-at format-date]
                           ["Branch" :branch id]
-                          ["Payment Number" :id strip-branch]
+                          ["Payment Number" :id]
                           ["Method" :method id]
                           ["Amount" :amount (comp right-align #(format-currency :amount %))]]}
 

@@ -1,6 +1,7 @@
 (ns amantha.components.forms
-  (:require  [amantha.utils :refer [e->value handler-fn]]
-             [reagent.ratom :as ratom]))
+  (:require
+    [amantha.utils :refer [e->value handler-fn]]
+    [reagent.ratom :as ratom]))
 
 (defn serialize-form
   "Convert from `{:a/b x}` to `{:a {:b x}}` to "
@@ -28,18 +29,16 @@
   (ratom/atom (deserialize-form data)))
 
 (defn handle-submit [state f]
-  (handler-fn (fn [e]
-                (let [data (serialize-form @state)]
-                  (f data)))))
+  (handler-fn (fn [_] (-> state deref serialize-form f))))
 
 (defn form-input
   ([state key]
    (form-input state key {}))
-  ([state key {:keys [label type placeholder on-change] :or {type "text" placeholder "" on-change (fn [])} :as opts}]
-   (merge opts {:class "form-control"
-                :type type
-                :value (get @state key)
+  ([state key {:keys [type placeholder on-change] :or {type "text" placeholder "" on-change (fn [])} :as opts}]
+   (merge opts {:class       "form-control"
+                :type        type
+                :value       (get @state key)
                 :placeholder placeholder
-                :on-change #(comp
-                             on-change
-                             (swap! state assoc key (e->value %)))})))
+                :on-change   #(comp
+                               on-change
+                               (swap! state assoc key (e->value %)))})))

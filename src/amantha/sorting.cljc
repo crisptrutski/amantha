@@ -13,7 +13,8 @@
         head          (take num existing-keys)
         tail          (drop num existing-keys)
         filtered-tail (remove is-key? existing-keys)]
-    (if (every? identity (map match? keys head))
+    (if (and (>= (count existing-keys) (count keys))
+             (every? identity (map match? keys head)))
       (concat (map toggle head) filtered-tail)
       (concat keys filtered-tail))))
 

@@ -30,7 +30,7 @@
 ;; API
 
 (defn filter-data [data filter-specs]
-  (if data
+  (when data
     (if-not filter-specs
       data
       (apply-filters data (combine-filters filter-specs)))))

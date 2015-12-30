@@ -1,65 +1,57 @@
 (ns amantha.components.filters
-  (:require [om.core :as om :include-macros true]
-            [cljs.core.async :refer [put!]]
-            [sablono.core :refer-macros [html]]
-            [amantha.utils :refer [e->value]]
-            [amantha.components.date-range-picker :refer [date-range-picker]]
-            [amantha.components.single-date-picker :refer [single-date-picker]]
-            [amantha.utils :refer [register-path-get-and-set enumerate]]
-            [clojure.string :as str]
-            cljsjs.jquery
-            select2.js
-            [re-frame.core :refer [subscribe dispatch register-sub register-handler]]))
+  (:require
+    #_select2.js
+    [cljs.core.async :refer [put!]]
+    [amantha.utils :refer [e->value register-path-get-and-set enumerate]]
+    [clojure.string :as str]
+    [re-frame.core :refer [subscribe dispatch register-sub register-handler]]))
 
 ;; Full Text Filter
 
-(defn handle-full-text-search-change [pattern cursor]
+(defn handle-full-text-search-change [pattern state]
   (fn [e]
     (let [v (e->value e)]
-      (om/update! cursor :value v)
-      (om/update! cursor :filters [[:include-string v pattern]]))))
+      (swap! state assoc :value v)
+      (swap! state assoc :filters [[:include-string v pattern]]))))
 
-(defn full-text-search [pattern data owner]
-  (om/component
-   (html [:div.form-horiztonal {:style {:padding "5px"}}
-          (when-let [l (:label data)] [:label.control-label l])
-          [:div.input-group
-           (when (= "^%s" pattern) [:span.input-group-addon "starts with"])
-           (when (= "%s$" pattern) [:span.input-group-addon "ends with"])
-           [:input.form-control {:value       (:value data)
-                                 :on-change   (handle-full-text-search-change pattern data)
-                                 :placeholder (:placeholder data)}]]])))
+(defn full-text-search [pattern data]
+  [:div.form-horiztonal {:style {:padding "5px"}}
+   (when-let [l (:label data)] [:label.control-label l])
+   [:div.input-group
+    (when (= "^%s" pattern) [:span.input-group-addon "starts with"])
+    (when (= "%s$" pattern) [:span.input-group-addon "ends with"])
+    [:input.form-control {:value       (:value data)
+                          :on-change   (handle-full-text-search-change pattern data)
+                          :placeholder (:placeholder data)}]]])
 
 ;; Date range
 
-(defn date-range [{:keys [start-date end-date] :as data} owner]
-  (om/component
-   (let [filter-state [[:date-range start-date end-date]]]
-     (if (not= (:filters data) (om/value filter-state))
-       (om/update! data :filters (om/value filter-state)))
-     (om/build date-range-picker data))))
+(defn date-range [{:keys [start-date end-date] :as data}]
+    (let [filter-state [[:date-range start-date end-date]]]
+      (if (not= (:filters data) filter-state)
+        (swap! data assoc :filters filter-state))
+      #_(date-range-picker data)))
 
 ;; Selector
 
-(defn handle-categorical-selector-change [cursor _]
+(defn handle-categorical-selector-change [state _]
   (fn [e]
     (let [v (e->value e)
           v (if (= v "default") nil v)]
-      (om/update! cursor :value v)
-      (om/update! cursor :filters [[:equal v]]))))
+      (swap! state assoc :value v)
+      (swap! state assoc :filters [[:equal v]]))))
 
 (defn categorical-selector [data owner]
-  (om/component
-   (html [:div.form-horizontal {:style {:padding "5px"}}
-          (when-let [l (:label data)]
-            [:label.control-label l])
-          [:div.input-group
-           (into [:select.form-control {:value (or (:value data) (:default data))
-                                        :on-change (handle-categorical-selector-change data owner)}]
-                 (for [option (:options data)]
-                   [:option {:value (name option)} (name option)]))]])))
+  [:div.form-horizontal {:style {:padding "5px"}}
+   (when-let [l (:label data)]
+     [:label.control-label l])
+   [:div.input-group
+    (into [:select.form-control {:value     (or (:value data) (:default data))
+                                 :on-change (handle-categorical-selector-change data owner)}]
+          (for [option (:options data)]
+            [:option {:value (name option)} (name option)]))]])
 
-(defn multi-selector
+#_(defn multi-selector
   [data owner]
   (reify
     om/IRender
@@ -69,16 +61,16 @@
         (om/set-state! owner :cursor data))
 
       (html
-       [:div.form-horizontal.filter-container
-        (when-let [label (:label data)]
-          [:label.control-label
-           label
-           [:small.text-muted " - Select one or more."]])
-        (into [:select.form-control {:multiple "multiple"
-                                     :ref "selector"
-                                     :data-placeholder "Any"}]
-              (for [option (:options data)]
-                [:option {:value (name option)} (name option)]))]))
+        [:div.form-horizontal.filter-container
+         (when-let [label (:label data)]
+           [:label.control-label
+            label
+            [:small.text-muted " - Select one or more."]])
+         (into [:select.form-control {:multiple         "multiple"
+                                      :ref              "selector"
+                                      :data-placeholder "Any"}]
+               (for [option (:options data)]
+                 [:option {:value (name option)} (name option)]))]))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -90,7 +82,7 @@
     om/IDidMount
     (did-mount [_]
       (let [select-elem (om/get-node owner "selector")
-            select2 (.select2 (js/$ select-elem))]
+            select2     (.select2 (js/$ select-elem))]
         (.on select2 "change"
              (fn [elem]
                (let [values (js->clj (.val (js/$ select-elem)))
@@ -100,36 +92,33 @@
 
 ;; Number Range Filter
 
-(defn handle-number-range-change [key cursor owner]
+(defn handle-number-range-change [key state owner]
   (fn [e]
     (let [s (str/replace (e->value e) #"\D" "")
           v (if-not (empty? s) s)]
-      (om/update! cursor key v)
-      (om/refresh! owner)
-      (om/update! cursor :filters [(if-let [f (:>= @cursor)] [:>= f])
-                                   (if-let [f (:<= @cursor)] [:<= f])]))))
+      (swap! state assoc key v)
+      (swap! state assoc
+             :filters [(when-let [f (:>= @state)] [:>= f])
+                       (when-let [f (:<= @state)] [:<= f])]))))
 
 (defn number-range [data owner]
-  (om/component
-   (html [:div.form-horizontal {:style {:padding "5px"}}
-          (when-let [l (:label data)] [:label.control-label l])
-          [:div.form-group
-           [:div.col-sm-6
-            [:div.input-group
-             [:span.input-group-addon ">="]
-             [:input.form-control {:type        :number
-                                   :on-change   (handle-number-range-change :>= data owner)
-                                   :value       (:>= data)
-                                   :placeholder (:placeholder data)}]]]
-           [:div.col-sm-6
-            [:div.input-group
-             [:span.input-group-addon "<="]
-             [:input.form-control {:type        :number
-                                   :on-change   (handle-number-range-change :<= data owner)
-                                   :value       (:<= data)
-                                   :placeholder (:placeholder data)}]]]]])))
-
-; Forecast options (not really filters, but I like the framework)
+  [:div.form-horizontal {:style {:padding "5px"}}
+   (when-let [l (:label data)] [:label.control-label l])
+   [:div.form-group
+    [:div.col-sm-6
+     [:div.input-group
+      [:span.input-group-addon ">="]
+      [:input.form-control {:type        :number
+                            :on-change   (handle-number-range-change :>= data owner)
+                            :value       (:>= data)
+                            :placeholder (:placeholder data)}]]]
+    [:div.col-sm-6
+     [:div.input-group
+      [:span.input-group-addon "<="]
+      [:input.form-control {:type        :number
+                            :on-change   (handle-number-range-change :<= data owner)
+                            :value       (:<= data)
+                            :placeholder (:placeholder data)}]]]]])
 
 (register-path-get-and-set
   :filter
@@ -143,8 +132,8 @@
          [:label.control-label label]
          [:div.input-group
           [:input.form-control
-           {:type :number
-            :value value
+           {:type      :number
+            :value     value
             :on-change #(dispatch [:filter page filter-key :value (str/replace (e->value %) #"\D" "")])}]
           [:span.input-group-addon "days"]]]))))
 
@@ -152,10 +141,10 @@
   (let [filter (subscribe [:filter page filter-key])]
     (fn [_]
       (let [{:keys [label handler]} @filter]
-          [:button.btn.btn-primary.form-control
-           {:on-click #(dispatch [handler])
-            :style {:margin-top "32px"}}
-           label]))))
+        [:button.btn.btn-primary.form-control
+         {:on-click #(dispatch [handler])
+          :style    {:margin-top "32px"}}
+         label]))))
 
 ;; Groups filter components in rows/columns
 
@@ -169,18 +158,10 @@
         (for [[colnum filter] (enumerate filter-group)]
           [:div.col-md-4.col-lg-4
            {:key colnum}
-             (filter-view-handler filter-view filter)])])]))
+           (filter-view-handler filter-view filter)])])]))
 
 (def grouped-filters
-  (grouped-filters-base om/build))
-
-(def grouped-filters-reagent
-  (grouped-filters-base vector))
-
-(defn grouped-filters-reagent-from-map [page]
-  (let [filters @(subscribe [:filter page])]
-    (grouped-filters-reagent (for [[key filter] filters]
-                               {:type (:type filter) :path [page key]}))))
+  (grouped-filters-base vec))
 
 ;; Dispatcher
 
@@ -204,14 +185,14 @@
 (defmethod filter-view :categorical-single [& args]
   (apply categorical-selector args))
 
-(defmethod filter-view :multi-select [& args]
+#_(defmethod filter-view :multi-select [& args]
   (apply multi-selector args))
 
 (defmethod filter-view :num-days [f]
   (num-days (:path f)))
 
-(defmethod filter-view :single-date [f]
-  (single-date-picker (:path f)))
+#_(defmethod filter-view :single-date [f]
+    (single-date-picker (:path f)))
 
 (defmethod filter-view :button [f]
   (button (:path f)))

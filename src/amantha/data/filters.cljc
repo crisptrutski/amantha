@@ -1,6 +1,8 @@
 (ns amantha.data.filters
-  (:require [clojure.string :as str]
-            [amantha.filters :refer [filter-check]]))
+  (:require
+    [clojure.string :as str]
+    [amantha.filters :refer [filter-check]])
+  #?(:clj (:import [java.util Date])))
 
 (defn ->float [s]
   (js/parseFloat s))
@@ -12,8 +14,9 @@
     #(re-find regex (.toLowerCase (or % "")))))
 
 (defmethod filter-check :date-range [[_ start-date end-date]]
-  ;; #+clj .getTime #+cljs
-  (let [t (fn [date] (.valueOf date))
+  (let [t (fn [date]
+            #?(:cljs (.valueOf date)
+               :clj  (.getTime ^Date date)))
         a (t start-date)
         b (t end-date)]
     #(<= a (t %) b)))

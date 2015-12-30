@@ -3,6 +3,7 @@
     [amantha.data.state-machine :as sm]
     #?(:clj [clojure.test :refer :all]
        :cljs [cljs.test :refer-macros [deftest is testing]])))
+
 ;; sufficient machine
 
 (def spec

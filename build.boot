@@ -12,13 +12,14 @@
                  [org.clojure/tools.nrepl   "0.2.12"      :scope "test"]
                  [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT"      :scope "test"]
 
+                 [cljsjs/jquery "2.1.4-0"]
+                 [cljsjs/bootstrap "3.3.6-0"]
+
                  [ankha "0.1.5.1-64423e"]
                  [ring "1.4.0"]
                  [compojure "1.4.0"]
                  [enlive "1.1.6"]
-                 [org.om/om "0.8.1"]
                  [environ "1.0.1"]
-                 [sablono "0.5.3"]
                  [secretary "1.2.3"]
                  [clj-http "2.0.0"]
                  [re-frame "0.5.0"]
@@ -52,7 +53,7 @@
 
 (deftask development []
   (task-options! cljs {:optimizations :none :source-map true}
-                 reload {:on-jsload 'amantha.app/init})
+                 reload {:on-jsload 'amantha.app/refresh})
   identity)
 
 (deftask dev

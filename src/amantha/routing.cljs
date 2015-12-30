@@ -1,10 +1,12 @@
 (ns amantha.routing
-  (:require [amantha.state :refer [app-state]]
-            [goog.events]
-            [goog.history.EventType :as EventType]
-            [re-frame.core :refer [dispatch dispatch-sync]]
-            [secretary.core :as secretary :refer-macros [defroute]])
+  (:require
+    [goog.events]
+    [goog.history.EventType :as EventType]
+    [re-frame.core :refer [dispatch dispatch-sync]]
+    [secretary.core :as secretary :refer-macros [defroute]])
   (:import goog.History))
+
+(def app-state (atom nil))
 
 (secretary/set-config! :prefix "#")
 
