@@ -10,7 +10,8 @@
                  [com.cemerick/piggieback   "0.2.1"       :scope "test"]
                  [weasel                    "0.7.0"       :scope "test"]
                  [org.clojure/tools.nrepl   "0.2.12"      :scope "test"]
-                 [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT"      :scope "test"]
+                 [adzerk/boot-test          "1.1.0"     :scope "tests"]
+                 [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT" :scope "test"]
 
                  [cljsjs/jquery "2.1.4-0"]
                  [cljsjs/bootstrap "3.3.6-0"]
@@ -31,6 +32,7 @@
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
  '[pandeiro.boot-http    :refer [serve]]
+ '[adzerk.boot-test      :refer :all]
  '[crisptrutski.boot-cljs-test :refer [test-cljs]])
 
 (deftask testing []
