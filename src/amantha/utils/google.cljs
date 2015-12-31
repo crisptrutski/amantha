@@ -1,4 +1,4 @@
-(ns amantha.google
+(ns amantha.utils.google
   (:require #_[ajax.core :refer [GET]]
             #_[gapi.js]))
 

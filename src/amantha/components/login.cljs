@@ -1,14 +1,11 @@
 (ns amantha.pages.login
-  (:require [amantha.utils :as utils :refer [e->value]]))
-
-(defn- get-state [a key]
-  (get @a key))
+  (:require [amantha.utils :as u]))
 
 (defn set-state! [a key val]
   (swap! a assoc key val))
 
 (defn bind-input [state key [tag attrs]]
-  [tag (assoc attrs :on-change #(set-state! state key (utils/e->value %)))])
+  [tag (assoc attrs :on-change #(set-state! state key (u/e->value %)))])
 
 (defn login-view [state]
   [:div#loginbox.mainbox.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
@@ -31,8 +28,8 @@
        (bind-input state :username
                    [:input#login-username.form-control
                     {:placeholder "username",
-                     :value       (get-state state :username)
-                     :on-change   #(set-state! state :username (e->value %))
+                     :value       (get @state :username)
+                     :on-change   #(set-state! state :username (u/e->value %))
                      :name        "username",
                      :type        "text"}])]
       [:div.input-group
@@ -41,8 +38,8 @@
        (bind-input state :password
                    [:input#login-password.form-control
                     {:placeholder "password",
-                     :value       (get-state state :password)
-                     :on-change   #(set-state! state :password (e->value %))
+                     :value       (get @state :password)
+                     :on-change   #(set-state! state :password (u/e->value %))
                      :name        "password",
                      :type        "password"}])]
       #_[:div.input-group

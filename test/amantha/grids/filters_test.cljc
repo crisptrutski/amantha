@@ -1,5 +1,5 @@
-(ns amantha.filters-test
-  (:require [amantha.filters :as f]
+(ns amantha.grids.filters-test
+  (:require [amantha.grids.filters :as f]
             #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is]])))
 
