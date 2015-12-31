@@ -4,3 +4,4 @@
 .nrepl-*
 ns-hierarchy.png
 .idea
+out/
