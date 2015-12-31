@@ -1,7 +1,9 @@
 (ns amantha.utils-test
-  (:require [amantha.utils :as u]
-            #?(:clj [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [deftest is testing]])))
+  (:require
+    [amantha.utils :as u]
+    [amantha.components.basic :as b]
+    #?(:clj [clojure.test :refer :all]
+       :cljs [cljs.test :refer-macros [deftest is testing]])))
 
 (deftest group-by-deep-test
   (testing "construct hierarchies from data easilly"
@@ -60,21 +62,9 @@
      (is (= "R 1,234,567.89"
             (u/format-currency :amount 1234567.8910)))))
 
-(deftest glyhicon-test
+(deftest glyphicon-test
   (testing "both varieties"
     (is (= [:span.glyphicon.glyphicon-pancake]
            (b/glyphicon :pancake)))
     (is (= [:span.right.glyphicon.glyphicon-chinchilla]
            (b/right-glyphicon 'chinchilla)))))
-
-;; TODO: test clj-only functions
-
-;; set-url!
-;; format-map
-;; format-date-generic
-;; format-date
-;; read-storage
-;; write-storage
-;; get-local-nav
-;; set-local-nav
-;; strip-timestamp

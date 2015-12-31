@@ -1,5 +1,5 @@
 (ns amantha.components.login
-  (:require [amantha.utils.dom :refer [e->value]))
+  (:require [amantha.utils.dom :refer [e->value]]))
 
 (defn set-state! [a key val]
   (swap! a assoc key val))
