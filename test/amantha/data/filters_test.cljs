@@ -1,6 +1,6 @@
 (ns amantha.data.filters-test
   (:require
-    [amantha.filters :refer [filter-once filter-data]]
+    [amantha.grids.filters :refer [filter-once filter-data]]
     ;; needed for multimethod implementations
     [amantha.data.filters]
     [clojure.string :as str]

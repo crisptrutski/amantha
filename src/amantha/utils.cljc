@@ -86,22 +86,12 @@
 (defn p [x] (prn x) x)
 (defn p* [f & args] (let [v (apply f args)] (prn v) v))
 
-;; UI Helpers
-
-(defn e->value [e]
-  (-> e .-target .-value))
-
-(defn glyphicon [type & body]
-  (apply vector
-         (keyword (str "span.glyphicon.glyphicon-" (name type)))
-         body))
-
-(defn right-glyphicon [type & body]
-  (apply vector
-         (keyword (str "span.right.glyphicon.glyphicon-" (name type)))
-         body))
-
 ;; strings
+
+(defn safe-name [nameable]
+  (if (implements? #?(:cljs INamed :clj clojure.lang.Named) nameable)
+    (name nameable)
+    (str nameable)))
 
 (defn titlecase [string]
   (as-> (name string) %

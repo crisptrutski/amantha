@@ -1,4 +1,4 @@
-(ns amantha.filters)
+(ns amantha.grids.filters)
 
 (defn ->float [s]
   #?(:clj  (Double. (str s))

@@ -1,4 +1,4 @@
-(ns amantha.sorting)
+(ns amantha.grids.sorting)
 
 ;; generic
 ;; ----------------------------

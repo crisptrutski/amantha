@@ -1,6 +1,6 @@
-(ns amantha.config-test
+(ns amantha.utils.config-test
   (:require
-    [amantha.config :refer :all]
+    [amantha.utils.config :refer :all]
     [amantha.utils.server :as server :refer [get-free-port! guess-host-name]]
     [clojure.test :refer :all]
     [environ.core :refer [env]])

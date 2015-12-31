@@ -1,8 +1,8 @@
-(ns amantha.pagination
+(ns amantha.grids.pagination
   (:refer-clojure :exclude [next])
   (:require
-    [amantha.utils :as u :refer [p p*]]
-    [amantha.sorting :refer [->lower compare-keys sort-by-keys]]))
+    [amantha.utils :refer [p p*]]
+    [amantha.grids.sorting :refer [->lower compare-keys sort-by-keys]]))
 
 ;; (def fast-sort (memoize sort-by-keys))
 (def fast-sort sort-by-keys)

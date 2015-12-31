@@ -1,5 +1,5 @@
-(ns amantha.sorting-test
-  (:require [amantha.sorting :as s]
+(ns amantha.grids.sorting-test
+  (:require [amantha.grids.sorting :as s]
             #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is testing]])))
 

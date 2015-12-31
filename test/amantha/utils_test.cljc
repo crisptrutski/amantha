@@ -34,6 +34,14 @@
                                      {:year 2014 :sales 50}
                                      {:year 2015 :sales 10}])))))
 
+(deftest safe-name-test
+  (testing "usual suspects"
+    (is (= "abc" (u/safe-name "abc")))
+    (is (= "abc" (u/safe-name 'abc)))
+    (is (= "abc" (u/safe-name :abc))))
+  (testing "less usual"
+    (is (= "Sir Thingy" (u/safe-name (reify Object (toString [_] "Sir Thingy")))))))
+
 (deftest titlecase-test
   (testing "covers entire sentence"
     (is (= "The Whole Enchilada"
@@ -55,10 +63,9 @@
 (deftest glyhicon-test
   (testing "both varieties"
     (is (= [:span.glyphicon.glyphicon-pancake]
-           (u/glyphicon :pancake)))
+           (b/glyphicon :pancake)))
     (is (= [:span.right.glyphicon.glyphicon-chinchilla]
-           (u/right-glyphicon 'chinchilla)))))
-
+           (b/right-glyphicon 'chinchilla)))))
 
 ;; TODO: test clj-only functions
 

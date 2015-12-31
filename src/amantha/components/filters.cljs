@@ -3,6 +3,8 @@
     #_select2.js
     [cljs.core.async :refer [put!]]
     [amantha.utils :as u]
+    [amantha.utils.dom :as dom]
+    [amantha.data.filters]
     [clojure.string :as str]
     [re-frame.core :refer [subscribe dispatch register-sub register-handler]]))
 
@@ -10,7 +12,7 @@
 
 (defn handle-full-text-search-change [pattern state]
   (fn [e]
-    (let [v (u/e->value e)]
+    (let [v (dom/e->value e)]
       (swap! state assoc :value v)
       (swap! state assoc :filters [[:include-string v pattern]]))))
 
@@ -36,7 +38,7 @@
 
 (defn handle-categorical-selector-change [state _]
   (fn [e]
-    (let [v (u/e->value e)
+    (let [v (dom/e->value e)
           v (if (= v "default") nil v)]
       (swap! state assoc :value v)
       (swap! state assoc :filters [[:equal v]]))))
@@ -94,7 +96,7 @@
 
 (defn handle-number-range-change [key state owner]
   (fn [e]
-    (let [s (str/replace (u/e->value e) #"\D" "")
+    (let [s (str/replace (dom/e->value e) #"\D" "")
           v (if-not (empty? s) s)]
       (swap! state assoc key v)
       (swap! state assoc
@@ -102,23 +104,24 @@
                        (when-let [f (:<= @state)] [:<= f])]))))
 
 (defn number-range [data owner]
-  [:div.form-horizontal {:style {:padding "5px"}}
-   (when-let [l (:label data)] [:label.control-label l])
-   [:div.form-group
-    [:div.col-sm-6
-     [:div.input-group
-      [:span.input-group-addon ">="]
-      [:input.form-control {:type        :number
-                            :on-change   (handle-number-range-change :>= data owner)
-                            :value       (:>= data)
-                            :placeholder (:placeholder data)}]]]
-    [:div.col-sm-6
-     [:div.input-group
-      [:span.input-group-addon "<="]
-      [:input.form-control {:type        :number
-                            :on-change   (handle-number-range-change :<= data owner)
-                            :value       (:<= data)
-                            :placeholder (:placeholder data)}]]]]])
+  (let [value @data]
+    [:div.form-horizontal {:style {:padding "5px"}}
+     (when-let [l (:label value)] [:label.control-label l])
+     [:div.form-group
+      [:div.col-sm-6
+       [:div.input-group
+        [:span.input-group-addon ">="]
+        [:input.form-control {:type        :number
+                              :on-change   (handle-number-range-change :>= data owner)
+                              :value       (:>= value)
+                              :placeholder (:placeholder value)}]]]
+      [:div.col-sm-6
+       [:div.input-group
+        [:span.input-group-addon "<="]
+        [:input.form-control {:type        :number
+                              :on-change   (handle-number-range-change :<= data owner)
+                              :value       (:<= value)
+                              :placeholder (:placeholder value)}]]]]]))
 
 (defn num-days [[page filter-key]]
   (let [filter (subscribe [:filter page filter-key])]
@@ -130,7 +133,7 @@
           [:input.form-control
            {:type      :number
             :value     value
-            :on-change #(dispatch [:filter page filter-key :value (str/replace (u/e->value %) #"\D" "")])}]
+            :on-change #(dispatch [:filter page filter-key :value (str/replace (dom/e->value %) #"\D" "")])}]
           [:span.input-group-addon "days"]]]))))
 
 (defn button [[page filter-key]]
@@ -157,11 +160,11 @@
            (filter-view-handler filter-view filter)])])]))
 
 (def grouped-filters
-  (grouped-filters-base vec))
+  (grouped-filters-base vector))
 
 ;; Dispatcher
 
-(defmulti filter-view (fn [x & _] (:type x)))
+(defmulti filter-view (fn [x & _] (:type @x)))
 
 (defmethod filter-view :full-text-search [& args]
   (apply full-text-search nil args))
@@ -181,8 +184,9 @@
 (defmethod filter-view :categorical-single [& args]
   (apply categorical-selector args))
 
-#_(defmethod filter-view :multi-select [& args]
-  (apply multi-selector args))
+(defmethod filter-view :multi-select [& args]
+  [:div "Not supported"]
+  #_(apply multi-selector args))
 
 (defmethod filter-view :num-days [f]
   (num-days (:path f)))

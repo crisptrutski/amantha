@@ -1,7 +1,8 @@
 (ns amantha.components.grid
-  (:require [amantha.pagination :as page]
-            [amantha.sorting :as s]
-            [amantha.utils :as utils :refer [glyphicon right-glyphicon]]
+  (:require [amantha.grids.pagination :as page]
+            [amantha.grids.sorting :as s]
+            [amantha.utils :as utils]
+            [amantha.components.basic :refer [glyphicon right-glyphicon]]
             [goog.string :as gstring]))
 
 ;; helpers

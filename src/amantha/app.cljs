@@ -1,29 +1,25 @@
 (ns amantha.app
   (:require [reagent.core :as reagent :refer [atom]]
             [amantha.components.grid :as grid]
-            [amantha.grids.repairs :as grid-utils]
             [amantha.utils :as u]
+            [amantha.utils.roman :as roman]
             [cljsjs.jquery]
-            [cljsjs.bootstrap]))
+            [cljsjs.bootstrap]
+            [amantha.components.basic :as b]
+            [amantha.components.filters :as filters]
+            [amantha.grids.filters :refer [filter-data]]))
 
 (enable-console-print!)
+
+(def app-state (atom nil))
+
+(def range-atom (atom {:key :b, :label "B", :type :number-range}))
 
 (def grid-atom (atom nil))
 
 (def print-outs (atom []))
 
 (defonce rows (atom []))
-
-(defn n->roman [num]
-  (if-not (pos? num)
-    "--"
-    (let [svm (into (sorted-map-by >) {1000 "M", 500 "D", 350 "LC", 100 "C", 50 "L", 40 "XL", 10 "X", 5 "V", 4 "IV", 1 "I", 9 "IX", 900 "CM", 90 "XC"})]
-      (letfn [(rn [r o]
-                (if (= r 0)
-                  o
-                  (let [d (first (filter #(<= (first %) r) svm))]
-                    (rn (- r (first d)) (str o (second d))))))]
-        (rn num "")))))
 
 (defn index-maps [xs]
   (let [xs* (map-indexed (fn [i x] (assoc x :idx i)) xs)]
@@ -46,11 +42,11 @@
 
 (defn some-grid []
   (grid/grid-view
-    @rows
-    {:headers     [["#" :idx (comp n->roman inc)]
+    (filter-data @rows [@range-atom])
+    {:headers     [["#" :idx (comp roman/from-number inc)]
                    ["A" :a u/format-date]
-                   ["B" :b (comp grid-utils/right-align #(u/format-currency :amount %))]
-                   ["C" :c grid-utils/points-render]]
+                   ["B" :b (comp b/right-align #(u/format-currency :amount %))]
+                   ["C" :c b/points-render]]
      :actions     [{:key     :delete
                     :label   "Delete"
                     :handler (fn [row] (swap! rows #(vec (remove #{row} %))))}
@@ -67,6 +63,9 @@
 
 (defn calling-component []
   [:div "Parent component"
+   (b/toggle-panel app-state "Filters" :hide-filters
+     (filters/grouped-filters
+       [range-atom]))
    [some-grid]
    (when (seq @print-outs) [:h5 "Printouts"])
    (into [:ul] (map-indexed (fn [i p] ^{:key i} [:li p]) @print-outs))

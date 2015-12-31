@@ -9,3 +9,6 @@
 (defn set-value-by-id [id value]
   (-> id get-by-id .-value (set! value)))
 
+(defn e->value [e]
+  (-> e .-target .-value))
+

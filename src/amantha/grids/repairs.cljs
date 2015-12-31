@@ -1,44 +1,14 @@
 (ns amantha.grids.repairs
-  (:require [amantha.utils :as utils :refer [format-currency format-date]]
+  (:require [amantha.utils :refer [format-currency format-date]]
+            [amantha.components.basic :as b]
             [goog.string]
             [goog.string.format]
             [cljs.core.async :refer [chan]]))
 
 (def id identity)
 
-(defn label [x] [:span.label.label-default x])
-
-(defn labels
-  ([options colors x]
-   (let [idx (mod (first (utils/positions #{x} options)) 7)]
-     [:span.label.label-defaul {:style {:background-color (nth colors idx)}} x]))
-  ([options x]
-   (let [idx (inc (mod (first (utils/positions #{x} options)) 7))]
-     [:span.label.label-defaul {:class (str "bg-col" idx)} x])))
-
-(defn link-to [url-fn x]
-  [:a {:href (url-fn x)} x])
-
-(def full-stars (take 5 (repeat (utils/glyphicon "star"))))
-
-(def empty-stars (take 5 (repeat (utils/glyphicon "star-empty"))))
-
-(defn points-render [num]
-  (let [num   (if (number? num) num (js/parseInt num))
-        full  (take num full-stars)
-        empty (take (- 5 num) empty-stars)
-        stars (concat full empty)]
-    (into [:span] (interpose " " stars))))
-
-(defn right-align [content]
-  [:div {:style {:width "100%" :text-align "right" :padding-right 10}}
-   content])
-
 (defn full-name [e]
   (str (:first-name e) " " (:last-name e)))
-
-(defn tick-view [tick?]
-  (utils/glyphicon (if tick? :ok :remove)))
 
 (def grids
   {:payments {:data-key  [:payments]
@@ -48,7 +18,7 @@
                           ["Branch" :branch id]
                           ["Payment Number" :id]
                           ["Method" :method id]
-                          ["Amount" :amount (comp right-align #(format-currency :amount %))]]}
+                          ["Amount" :amount (comp b/right-align #(format-currency :amount %))]]}
 
    :clients  {:data-key  [:clients]
               :hist-key  nil
@@ -66,8 +36,8 @@
               :headers   [["Date" :created-at format-date]
                           ["Branch" :branch id]
                           ["Name" full-name id [:first-name :last-name]]
-                          ["Rating" :rating label]
-                          ["Job" :job-id (partial link-to #(str "#/job/" %))]
+                          ["Rating" :rating b/label]
+                          ["Job" :job-id (partial b/link-to #(str "#/job/" %))]
                           ["Comments" :comments id]]}
 
    :users    {:data-key  [:users]
@@ -79,10 +49,9 @@
                           ["Display Name" :display-name id]
                           ["Email" :email (comp #(.toLowerCase %) str)]
                           ["Phone" :phone id]
-                          ["Active?" :is-active (comp tick-view boolean)]]}})
+                          ["Active?" :is-active (comp b/tick-view boolean)]]}})
 
-
-(defn filters-for [user]
+(defn filters-for [_]
   {:payments [{:key :created-at, :label "Date", :type :date-range}
               {:key     :method, :label "Method", :type :multi-select,
                :options ["Credit Card" "Cash" "Bank Deposit" "iSureFix" "SnapScan" "Santam"]}]

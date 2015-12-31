@@ -11,11 +11,6 @@
 (def base
   (get-window "API_BASE_URI" ""))
 
-(defn- safe-name [nameable]
-  (if (implements? INamed nameable)
-    (name nameable)
-    (str nameable)))
-
 (defn- build-url [& segments]
   (str/join "/" (cons base (map safe-name segments))))
 

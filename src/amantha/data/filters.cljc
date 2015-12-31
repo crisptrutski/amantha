@@ -1,11 +1,11 @@
 (ns amantha.data.filters
   (:require
     [clojure.string :as str]
-    [amantha.filters :refer [filter-check]])
+    [amantha.grids.filters :refer [filter-check]])
   #?(:clj (:import [java.util Date])))
 
-(defn ->float [s]
-  (js/parseFloat s))
+(defn parse-float [s]
+  #?(:cljs (js/parseFloat s) :clj (Double/parseDouble s)))
 
 (defmethod filter-check :include-string [[_ match pattern]]
   (let [lower (.toLowerCase match)
@@ -24,11 +24,10 @@
 (defmethod filter-check :equal [[_ value]] #{value})
 
 (defmethod filter-check :>= [[_ n]]
-  (let [n (->float n)] #(>= (->float %) n)))
+  (let [n (parse-float n)] #(>= (parse-float %) n)))
 
 (defmethod filter-check :<= [[_ n]]
-  (let [n (->float n)] #(<= (->float %) n)))
+  (let [n (parse-float n)] #(<= (parse-float %) n)))
 
 (defmethod filter-check :any-of [[_ values]]
-  (fn [val]
-    (some #{val} values)))
+  (fn [val] (some #{val} values)))
