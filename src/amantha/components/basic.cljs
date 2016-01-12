@@ -18,13 +18,6 @@
   [:div {:style {:width "100%" :text-align "right" :padding-right 10}}
    content])
 
-(defn dev-view
-  "Display children only in development."
-  [content]
-  ;; TODO: more mature ENV access
-  (when js/IS_DEV
-    [:div content]))
-
 (defn glyphicon [type & body]
   (apply vector
          (keyword (str "span.glyphicon.glyphicon-" (name type)))

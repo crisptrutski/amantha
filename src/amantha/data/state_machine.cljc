@@ -20,31 +20,27 @@
   [machine]
   (some (fn [state]
           (let [targets (map :target (vals (:actions state)))
-                counts (vals (frequencies targets))]
+                counts  (vals (frequencies targets))]
             (< 1 (reduce max 0 counts))))
         machine))
-
 
 (defn- central-states-sorted?
   "Central states are not in canonical order (ie. each is the :next of the last)"
   [machine]
   (let [central-states (filter (comp #{:central} :type) machine)]
     (some
-     (fn [[state next-key]]
-       (let [edges (vals (:actions state))]
-         (not= next-key (:target (first (filter (comp #{:next} :type) edges))))))
-     (map vector central-states (map :id (rest central-states))))))
+      (fn [[state next-key]]
+        (let [edges (vals (:actions state))]
+          (not= next-key (:target (first (filter (comp #{:next} :type) edges))))))
+      (map vector central-states (map :id (rest central-states))))))
+
+(def error-types
+  {:ambiguous-routes     multi-graph?
+   :central-out-of-order central-states-sorted?})
 
 (defn errors [machine]
-  (reduce
-   (fn [errors [error error-test]]
-     (if (error-test machine)
-       (conj errors error)
-       errors))
-   #{}
-   ;; TODO: everything is hydrated (eg. all functions replaced)
-   {:ambiguous-routes     multi-graph?
-    :central-out-of-order central-states-sorted?}))
+  (let [fail? #(let [f (error-types %)] (f machine))]
+    (into #{} (filter fail?) (keys error-types))))
 
 (defn valid? [machine]
   (empty? (errors machine)))
@@ -87,8 +83,8 @@
   [actions pred-arg]
   (let [valid (filter #(actionable? (second %) pred-arg) actions)]
     (cond (second valid) (prn "Warning - multiple implicit states to take")
-          (seq    valid) (ffirst valid)
-          :else          nil)))
+          (seq valid) (ffirst valid)
+          :else nil)))
 
 (defn -handle-action
   "If actionable, return list of events to dispatch."
@@ -116,8 +112,7 @@
 
 ;; Implementation
 
-(defrecord ValueStateMachine  [spec ->state ->effect ->switch value]
-
+(defrecord ValueStateMachine [spec ->state ->effect ->switch value]
   StateMachine
   (current-state [_]
     (find-state spec (->state value)))
@@ -136,7 +131,7 @@
       (-implicit-action implicit value))))
 
 
-;; Consutructors
+;; Constructors
 
 (defn multi-group-by
   "Similar to group-by, but index by every value in the collection returned by `group-fn`.
@@ -146,8 +141,8 @@
 
   ([f xs xform]
    (reduce
-    (fn [h x] (let [v (xform x)] (reduce (fn [h y] (update h y #(conj % v))) h (f x))))
-    {} xs)))
+     (fn [h x] (let [v (xform x)] (reduce (fn [h y] (update h y #(conj % v))) h (f x))))
+     {} xs)))
 
 (defn build
   "Build state machine specification from normalized definition."

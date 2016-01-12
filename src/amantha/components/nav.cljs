@@ -2,20 +2,16 @@
   (:require [amantha.utils :as utils]
             [amantha.utils.google :as goog]))
 
-(defn- ensure-hash [url]
-  (if (= \# (first url))
-    (apply str "/#" (rest url))
-    (str "/#" url)))
-
 (defn sections-nav
   "The actual navigation bar showing the sections the user may navigate to"
   [sections user app]
   [:ul.nav.navbar-nav
    (when user
-     (for [[section-key route] sections]
-       [:li {:key section-key, :class (when (= (:nav app) section-key) "active")}
-        [:a {:href (ensure-hash route)}
-         (utils/titlecase section-key)]]))])
+     (doall
+       (for [[section-key route] sections]
+         [:li {:key section-key, :class (when (= (:nav app) section-key) "active")}
+          [:a {:href (utils/ensure-hash route)}
+           (utils/titlecase section-key)]])))])
 
 (defn user-widget
   "Dropdown menu and sign-out button for the user"

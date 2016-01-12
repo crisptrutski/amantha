@@ -11,6 +11,13 @@
 
 (defn no-op [& _])
 
+(defn ensure-hash
+  "Ensure that URL is absolute-fragment"
+  [url]
+  (if (= \# (first url))
+    (apply str "/#" (rest url))
+    (str "/#" url)))
+
 (defn group-by-deep [ks data]
   (if-not (seq ks)
     data

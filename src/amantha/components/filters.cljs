@@ -16,15 +16,16 @@
       (swap! state assoc :value v)
       (swap! state assoc :filters [[:include-string v pattern]]))))
 
-(defn full-text-search [pattern data]
-  [:div.form-horiztonal {:style {:padding "5px"}}
-   (when-let [l (:label data)] [:label.control-label l])
-   [:div.input-group
-    (when (= "^%s" pattern) [:span.input-group-addon "starts with"])
-    (when (= "%s$" pattern) [:span.input-group-addon "ends with"])
-    [:input.form-control {:value       (:value data)
-                          :on-change   (handle-full-text-search-change pattern data)
-                          :placeholder (:placeholder data)}]]])
+(defn full-text-search [pattern state]
+  (let [data @state]
+    [:div.form-horiztonal {:style {:padding "5px"}}
+     (when-let [l (:label data)] [:label.control-label l])
+     [:div.input-group
+      (when (= "^%s" pattern) [:span.input-group-addon "starts with"])
+      (when (= "%s$" pattern) [:span.input-group-addon "ends with"])
+      [:input.form-control {:value       (:value data)
+                            :on-change   (handle-full-text-search-change pattern state)
+                            :placeholder (:placeholder data)}]]]))
 
 ;; Date range
 

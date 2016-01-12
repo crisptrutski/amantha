@@ -3,6 +3,7 @@
             [amantha.grids.sorting :as s]
             [amantha.utils :as utils]
             [amantha.components.basic :refer [glyphicon right-glyphicon]]
+            [amantha.components.filters :as f]
             [goog.string :as gstring]))
 
 ;; helpers
@@ -126,6 +127,9 @@
              :style {:width col-width, :text-align "left"}}
         (interpose " " (remove nil? (map (partial grid-action-cell row) actions)))]))])
 
+;; TODO: use internal state for table filters
+(def att (reagent.core/atom nil))
+
 (defn draw-grid [state-atom config headers actions rows
                  & [{:keys [idx current-page total-pages prev? next? total until] :as pagination}
                     {:keys [pagination? footer no-stripes] :as opts}]]
@@ -150,16 +154,27 @@
        [:tr {:key "header"}
         ^{:key "headers"}
         (list (doall (map (partial grid-header-cell config state-atom) headers))
-              (when (seq actions) [:th {:key "actions"}]))]]
+              (when (seq actions) [:th {:key "actions"}]))]
+       ;; parameterise
+       (when true
+         [:tr {:key "filter"}
+          (doall
+            (for [h headers]
+              ^{:key (first h)}
+              [:td
+               [:input.form-control {:value       (:value @att)
+                                     :on-change   (f/handle-full-text-search-change "%s" att)
+                                     :placeholder (:placeholder @att)}]]))])]
       [:tbody
        (if-not (seq rows)
          [:tr {:key "loading"}
           [:td {:col-span (inc (count headers))}
            (if pending? "Loading.." "No Data.")]]
          ;; grid contents
-         (for [r rows]
-           ^{:key (row-id r)}
-           (grid-row r [row-id headers actions col-width])))]
+         (doall
+           (for [r rows]
+             ^{:key (row-id r)}
+             (grid-row r [row-id headers actions col-width]))))]
       (if footer
         [:tfoot
          (footer rows)])]

@@ -1,16 +1,10 @@
 (ns amantha.api-routes
   (:require [clojure.string :as str]
-            [amantha.utils :as u]))
-
-(defn- get-window
-  ([key]
-    (get-window key nil))
-  ([key default]
-   (or (and js/window (aget js/window key))
-       default)))
+            [amantha.utils :as u]
+            [amantha.utils.config :as config]))
 
 (def base
-  (get-window "API_BASE_URI" ""))
+  (config/get-env :api-base-url ""))
 
 (defn- build-url [& segments]
   (str/join "/" (cons base (map u/safe-name segments))))

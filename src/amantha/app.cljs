@@ -3,6 +3,7 @@
             [amantha.components.grid :as grid]
             [amantha.utils :as u]
             [amantha.utils.roman :as roman]
+            [amantha.api-routes]
             [cljsjs.jquery]
             [cljsjs.bootstrap]
             [amantha.components.basic :as b]
