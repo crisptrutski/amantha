@@ -94,9 +94,9 @@
 (defn p* [f & args] (let [v (apply f args)] (prn v) v))
 
 ;; strings
-
 (defn safe-name [nameable]
-  (if (implements? #?(:cljs INamed :clj clojure.lang.Named) nameable)
+  (if #?(:clj (instance? clojure.lang.Named nameable)
+         :cljs (implements? INamed nameable))
     (name nameable)
     (str nameable)))
 
@@ -131,4 +131,11 @@
 
 (defn enumerate [coll]
   (map vector (range) coll))
+
+(defn coerce-long [s]
+  (if (number? s) s #?(:cljs (js/parseInt s) :clj (Long/parseLong s))))
+
+(defn coerce-float [s]
+  (if (number? s) (float s) #?(:cljs (js/parseFloat s) :clj (Double/parseDouble s))))
+
 

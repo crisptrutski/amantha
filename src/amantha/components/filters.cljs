@@ -27,13 +27,7 @@
                             :on-change   (handle-full-text-search-change pattern state)
                             :placeholder (:placeholder data)}]]]))
 
-;; Date range
-
-(defn date-range [{:keys [start-date end-date] :as data}]
-    (let [filter-state [[:date-range start-date end-date]]]
-      (if (not= (:filters data) filter-state)
-        (swap! data assoc :filters filter-state))
-      #_(date-range-picker data)))
+;; TODO Date range
 
 ;; Selector
 
@@ -177,7 +171,7 @@
   (apply full-text-search "%s$" args))
 
 (defmethod filter-view :date-range [& args]
-  (apply date-range args))
+  [:div "TODO" (:type @(first args))])
 
 (defmethod filter-view :number-range [& args]
   (apply number-range args))
@@ -186,14 +180,13 @@
   (apply categorical-selector args))
 
 (defmethod filter-view :multi-select [& args]
-  [:div "Not supported"]
-  #_(apply multi-selector args))
+  [:div "TODO" (:type @(first args))])
 
 (defmethod filter-view :num-days [f]
-  (num-days (:path f)))
+  (num-days (:path @f)))
 
-#_(defmethod filter-view :single-date [f]
-    (single-date-picker (:path f)))
+(defmethod filter-view :single-date [f]
+  [:div "TODO" (:type @f)])
 
 (defmethod filter-view :button [f]
-  (button (:path f)))
+  (button (:path @f)))

@@ -37,12 +37,12 @@
   (testing "put it all together"
     (let [env (assoc env :lein-version "2.5.1")]
       (is (= {:host         (guess-host-name)
-              :service-name "amantha.config"
+              :service-name "amantha.utils"
               :lein-version (:lein-version env)
               :port         231}
              (gen-conf
                ;; defaults
-               {:host (server/guess-host-name)
+               {:host (guess-host-name)
                 :port 231}
                ;; env
                env

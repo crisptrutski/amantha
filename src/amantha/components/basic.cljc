@@ -49,7 +49,7 @@
 (def empty-stars (take 5 (repeat (g "star-empty"))))
 
 (defn points-render [num]
-  (let [num   (if (number? num) num (js/parseInt num))
+  (let [num   (u/coerce-long num)
         full  (take num full-stars)
         empty (take (- 5 num) empty-stars)
         stars (concat full empty)]

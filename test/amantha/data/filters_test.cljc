@@ -1,10 +1,10 @@
 (ns amantha.data.filters-test
   (:require
-    [amantha.grids.filters :refer [filter-once filter-data]]
-    ;; needed for multimethod implementations
     [amantha.data.filters]
+    [amantha.grids.filters :refer [filter-once filter-data]]
     [clojure.string :as str]
-    [cljs.test :refer-macros [deftest is testing]]))
+    #?(:clj [clojure.test :refer :all]
+       :cljs [cljs.test :refer-macros [deftest is testing]])))
 
 (def ^:private str-rev (comp str/join reverse))
 
@@ -55,8 +55,8 @@
                      {:id "4" :branch "Cape Town"}
                      {:id "5" :branch "Stellenbosch"}
                      {:id "6" :branch "Stellenbosch"}]
-        id-list (partial map :id)
-        all-ids (id-list sample-data)]
+        id-list     (partial map :id)
+        all-ids     (id-list sample-data)]
     (is (= all-ids
            (id-list (filter-once sample-data [:branch [:any-of nil]]))))
     (is (= ["1" "4"]
@@ -67,20 +67,21 @@
            (id-list (filter-once sample-data [:branch [:any-of ["Stellenbosch"]]]))))
     (is (= ["1" "3" "4" "5" "6"]
            (id-list (filter-once sample-data [:branch [:any-of ["Cape Town" "Stellenbosch"]]]))))
-    (is (=  ["2" "3"  "5" "6"]
-            (id-list (filter-once sample-data [:branch [:any-of ["Canal Walk" "Stellenbosch"]]]))))
+    (is (= ["2" "3" "5" "6"]
+           (id-list (filter-once sample-data [:branch [:any-of ["Canal Walk" "Stellenbosch"]]]))))
     (is (= all-ids
            (id-list (filter-once sample-data [:branch [:any-of ["Cape Town" "Canal Walk" "Stellenbosch"]]]))))))
 
 (deftest filter-data-test
   (is (= [{:a 1, :b "cat", :c :++}
           {:a 2, :b "rat", :c :++}]
-         (filter-data [{:a 1, :b "cat", :c :++}
-                       {:a 2, :b "cot", :c :++}
-                       {:a 2, :b "rat", :c :++}
-                       {:a 3, :b "bat", :c :--}
-                       {:a 4, :b "hit", :c :++}
-                       {:a 5, :b "cut", :c :--}]
-                      [{:key :a, :filters [[:<= 3]]}
-                       {:key :b, :filters [[:include-string "a"]]}
-                       {:key :c, :filters [[:equal :++]]}]))))
+         (filter-data
+           [{:a 1, :b "cat", :c :++}
+            {:a 2, :b "cot", :c :++}
+            {:a 2, :b "rat", :c :++}
+            {:a 3, :b "bat", :c :--}
+            {:a 4, :b "hit", :c :++}
+            {:a 5, :b "cut", :c :--}]
+           [{:key :a, :filters [[:<= 3]]}
+            {:key :b, :filters [[:include-string "a"]]}
+            {:key :c, :filters [[:equal :++]]}]))))
