@@ -1,6 +1,6 @@
 (ns amantha.components.forms
   (:require
-    [amantha.utils :refer [handler-fn]]
+    [amantha.utils :refer [no-op handler-fn]]
     [amantha.utils.dom :refer [e->value]]
     [reagent.ratom :as ratom]))
 
@@ -35,11 +35,13 @@
 (defn form-input
   ([state key]
    (form-input state key {}))
-  ([state key {:keys [type placeholder on-change] :or {type "text" placeholder "" on-change (fn [])} :as opts}]
-   (merge opts {:class       "form-control"
-                :type        type
-                :value       (get @state key)
-                :placeholder placeholder
-                :on-change   #(comp
-                               on-change
-                               (swap! state assoc key (e->value %)))})))
+  ([state key {:keys [type placeholder on-change]
+               :or {type "text"
+                    placeholder ""
+                    on-change no-op} :as opts}]
+   (merge opts
+          {:class       "form-control"
+           :type        type
+           :value       (get @state key)
+           :placeholder placeholder
+           :on-change   #(comp on-change (swap! state assoc key (e->value %)))})))
