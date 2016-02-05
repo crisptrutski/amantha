@@ -1,15 +1,7 @@
 (ns amantha.grids.pagination
   (:refer-clojure :exclude [next])
   (:require
-    [amantha.utils :refer [p p*]]
     [amantha.grids.sorting :refer [->lower compare-keys sort-by-keys]]))
-
-;; (def fast-sort (memoize sort-by-keys))
-(def fast-sort sort-by-keys)
-
-(declare ->PageAfter)
-
-;; NOTE: Probably should absorb sort-keys
 
 (defprotocol IPagination
   (next [_])
@@ -21,7 +13,7 @@
 
 (defn- -paginate [drop? data sort-keys limit & [flip]]
   (as-> data %
-    (fast-sort sort-keys %)
+    (sort-by-keys sort-keys %)
     (if drop? (remove drop? %) %)
     ((if flip take-last take) limit %)))
 
@@ -49,8 +41,8 @@
 
 (extend-protocol IPagination
   nil
-  (next [this] (next open))
-  (prev [this] (prev open))
+  (next [_] (next open))
+  (prev [_] (prev open))
   (next-count [_ data sort-keys] (next-count open data sort-keys))
   (prev-count [_ data sort-keys] (prev-count open data sort-keys))
   (serialize [_] (serialize open))
@@ -66,6 +58,8 @@
   (serialize [_] [:last])
   (paginate [_ data sort-keys limit]
     (-paginate nil data sort-keys limit true)))
+
+(declare ->PageAfter)
 
 (defrecord PageBefore [value inclusive]
   IPagination

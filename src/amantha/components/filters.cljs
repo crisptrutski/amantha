@@ -1,12 +1,10 @@
 (ns amantha.components.filters
   (:require
-    #_select2.js
     [cljs.core.async :refer [put!]]
     [amantha.utils :as u]
     [amantha.utils.dom :as dom]
     [amantha.data.filters]
-    [clojure.string :as str]
-    [re-frame.core :refer [subscribe dispatch register-sub register-handler]]))
+    [clojure.string :as str]))
 
 ;; Full Text Filter
 
@@ -48,45 +46,6 @@
           (for [option (:options data)]
             [:option {:value (name option)} (name option)]))]])
 
-#_(defn multi-selector
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      ;; hack to support a static callback to select2
-      (if (not= data (om/get-state owner :cursor))
-        (om/set-state! owner :cursor data))
-
-      (html
-        [:div.form-horizontal.filter-container
-         (when-let [label (:label data)]
-           [:label.control-label
-            label
-            [:small.text-muted " - Select one or more."]])
-         (into [:select.form-control {:multiple         "multiple"
-                                      :ref              "selector"
-                                      :data-placeholder "Any"}]
-               (for [option (:options data)]
-                 [:option {:value (name option)} (name option)]))]))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      ;; hack to force rerender of select2 component, with
-      (let [jq-elem (js/$ (om/get-node owner "selector"))]
-        (.val jq-elem (clj->js (:value data)))
-        (.select2 jq-elem)))
-
-    om/IDidMount
-    (did-mount [_]
-      (let [select-elem (om/get-node owner "selector")
-            select2     (.select2 (js/$ select-elem))]
-        (.on select2 "change"
-             (fn [elem]
-               (let [values (js->clj (.val (js/$ select-elem)))
-                     cursor (om/get-state owner :cursor)]
-                 (om/update! cursor :value values)
-                 (om/update! cursor :filters [[:any-of values]]))))))))
-
 ;; Number Range Filter
 
 (defn handle-number-range-change [key state owner]
@@ -118,28 +77,6 @@
                               :value       (:<= value)
                               :placeholder (:placeholder value)}]]]]]))
 
-(defn num-days [[page filter-key]]
-  (let [filter (subscribe [:filter page filter-key])]
-    (fn [_]
-      (let [{:keys [label value]} @filter]
-        [:div.form-horizontal {:style {:padding "5px"}}
-         [:label.control-label label]
-         [:div.input-group
-          [:input.form-control
-           {:type      :number
-            :value     value
-            :on-change #(dispatch [:filter page filter-key :value (str/replace (dom/e->value %) #"\D" "")])}]
-          [:span.input-group-addon "days"]]]))))
-
-(defn button [[page filter-key]]
-  (let [filter (subscribe [:filter page filter-key])]
-    (fn [_]
-      (let [{:keys [label handler]} @filter]
-        [:button.btn.btn-primary.form-control
-         {:on-click #(dispatch [handler])
-          :style    {:margin-top "32px"}}
-         label]))))
-
 ;; Groups filter components in rows/columns
 
 (declare filter-view)
@@ -170,23 +107,17 @@
 (defmethod filter-view :end-text-search [& args]
   (apply full-text-search "%s$" args))
 
-(defmethod filter-view :date-range [& args]
-  [:div "TODO" (:type @(first args))])
-
 (defmethod filter-view :number-range [& args]
   (apply number-range args))
 
 (defmethod filter-view :categorical-single [& args]
   (apply categorical-selector args))
 
-(defmethod filter-view :multi-select [& args]
-  [:div "TODO" (:type @(first args))])
-
-(defmethod filter-view :num-days [f]
-  (num-days (:path @f)))
-
 (defmethod filter-view :single-date [f]
   [:div "TODO" (:type @f)])
 
-(defmethod filter-view :button [f]
-  (button (:path @f)))
+(defmethod filter-view :date-range [& args]
+  [:div "TODO" (:type @(first args))])
+
+(defmethod filter-view :multi-select [& args]
+  [:div "TODO" (:type @(first args))])

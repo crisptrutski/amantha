@@ -242,3 +242,42 @@ button:focus, button:active {
 .error {
   padding: 10px 20px;
 }
+
+
+
+
+
+/* stuff */
+
+.statsDiv {
+    background-color: #f4f4f4;
+    padding:15px 15px 3px 15px;
+    border-radius: 10px;
+    border: 1px solid #DADADA;
+}
+.statsTable td,.statsTable th {
+    border-bottom: 1px solid #CBCBCB;
+    padding: 8px;
+}
+.statsTable--small tbody td, .statsTable--small tbody th {
+    padding: 4px 4px 4px 8px;
+    font-size:12px;
+}
+.statsTable--small tbody td {
+    background-color: #ccc;
+}
+.statsTable tr:last-of-type td, .statsTable tr:last-of-type th {
+    border-bottom: none;
+}
+.statsTable th {
+    color: #626262;
+    text-align: left;
+    padding-right:20px;
+    font-weight: bold;
+}
+.statsTable th.statsDiv--header {
+    color: #414141;
+    font-size:15px;
+    padding-top:11px;
+    padding-bottom:3px;
+}

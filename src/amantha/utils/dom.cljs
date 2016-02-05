@@ -12,3 +12,5 @@
 (defn e->value [e]
   (-> e .-target .-value))
 
+(defn e->no-op [e]
+  (doto e .preventDefault .stopPropagation))

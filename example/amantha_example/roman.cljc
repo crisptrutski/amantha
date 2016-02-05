@@ -1,4 +1,4 @@
-(ns amantha.utils.roman)
+(ns amantha-example.roman)
 
 (def roman-vals
   (into (sorted-map-by >)
@@ -16,13 +16,15 @@
          900  "CM"
          90   "XC"}))
 
+(defn greedy-pair
+  "Find the largest [value symbol] pair <= num"
+  [num]
+  (first (filter (comp (partial >= num) first) roman-vals)))
+
 (defn from-number [num]
   (if-not (pos? num)
     "--"
-    (letfn [(rn [r o]
-              (if (= r 0)
-                o
-                (let [d (first (filter #(<= (first %) r) roman-vals))]
-                  (rn (- r (first d)) (str o (second d))))))]
-      (rn num ""))))
-
+    (loop [r num o ""]
+      (if-not (pos? r) o
+        (let [[val sym] (greedy-pair r)]
+          (recur (- r val) (str o sym)))))))
